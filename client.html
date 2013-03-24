@@ -1,27 +1,48 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Tumblr Trends</title>
+    <title>Favourite Tweets</title>
     <script src="js/jquery-1.9.0.min.js" type="text/javascript"></script>
     <script src="js/jquery.mobile-1.3.0-rc.1.js" type="text/javascript"></script>
 	<script src="js/jquery.sparkline.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="css/custom.css">
     <link rel="stylesheet" href="css/jqm-demos.css">
     <link rel="stylesheet" href="css/jquery.mobile-1.3.0-rc.1.css">
+
+	<style>
+
+	@media all and (max-width: 50em) {
+	/* stack all grids below 50em */
+		.my-breakpoint .ui-block-a,
+		.my-breakpoint .ui-block-b {
+			width: 100%;
+			float:none;
+		}
+	}
+
+	</style>
+	
+
 </head>
 <body>
 
 <div data-role="page">
 
-    <div data-role="header" data-theme="f">
-        <h1>Tumblr Trending Right Now</h1>
+    <div data-role="header" data-theme="b">
+        <h1>Your favourite tweets right now</h1>
     </div><!-- /header -->
     
     <div data-role="content">
    
-	<div id="items" class="ui-grid-b">
-	
-	</div>
+
+	<div class="ui-grid-a my-breakpoint">
+		<div class="ui-block-a">
+			<ul id="col1" class="ui-icon-alt" data-role="listview" data-inset="true"></ul>
+		</div>
+		<div class="ui-block-b">
+			<ul id="col2" class="ui-icon-alt" data-role="listview" data-inset="true"></ul>
+		</div>
+    </div>
     
     </div><!-- /content -->
     
@@ -35,52 +56,38 @@
 </body>
 
 <script type="text/javascript">
-    $.getJSON('http://greywolf.cdf.toronto.edu:30950/user.php/blogs/trends?order=Trending&limit=25&callback=?', function (data) {
+	var col = "#col1";
+
+    $.getJSON('model.json', function (data) {
 		
-        var order = data.order;
-        var limit = data.limit;
-            
-        var trending, tracking;
+        for (var i = 0; i < data.length; i++) {
 
-        $.each(data.trending, function () {
-            trending = this;
-   		
-            var url, text, image, date, last_track, last_count;
+			var image = data[i].user.profile_image_url	;	
+			var url = data[i].user.url;
+			var name = data[i].user.name;
+			var text = data[i].text;
+         	
+			var shtml='';   
+            		
+			shtml=shtml+'<li>';
+            shtml=shtml+'<img width="100px" src=\"'+image+'\" />';
 
-            url=trending.url;
-            text=trending.text;
-            image=trending.image;
-            date=trending.date;
-            last_track=trending.last_track;
-            last_count=trending.last_count;
-
-            var shtml='';    
-
-            shtml=shtml+'<div class="ui-block-a">';
-            shtml=shtml+'<a href="'+url+'">';
-            shtml=shtml+'<img width="100px" src="'+image+'" /></a><br></div>';
-			shtml=shtml+'<div class="ui-block-b">';
-			shtml=shtml+'Found on '+date+'<br>';
-            shtml=shtml+text;
-			shtml=shtml+'</div>';            
-            
-			var graph = new Array(trending.tracking.length);
-			graph[0]=0;
-            $.each(trending.tracking, function(){
-                var track = this;
-				graph[track.sequence] = track.count;
-            });      
-  			
-			shtml=shtml+'<div class="ui-block-c">';
-			shtml=shtml+'<span class="inlinesparkline">';
-			shtml=shtml+graph.toString();
-			shtml=shtml+'</span></div>';
+            shtml=shtml+'<h3>'+name+'</h3>';
+            shtml=shtml+'<p>'+text+'</p>';
+			 shtml=shtml+'<p>Source:'+url+'</p>';
+          
+            shtml=shtml+'</li>';
+		
 						
-			$('#items').append(shtml);
-            
-        });
+			$(col).append(shtml);
 
-		$('.inlinesparkline').sparkline('html',{type:'bar', height:'50', barWidth:20});
+			if (col == "#col1") {
+				col = "#col2"
+			} else {
+				col = "#col1";
+			}
+        }
+
     });
 
 </script>
