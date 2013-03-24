@@ -11,31 +11,40 @@
 	<style>
  	body{ height:100%; width:100% }
 
-	/* If screen is too small, don't display description */
+	/* If screen is too small, don't display source url and reduce text size */
 	@media screen and (max-width: 640px) {
-		#text {display: none;}
+		#text {font-size:75%;}
+		#src {display:none;}
 	}
 
 	@media screen and (max-width: 500px) {
-		#profile {
-			height: 65px;
-		}
-
-		#image {
-			height:65px;
-			width:65px;
-		}
-
 		.extra{
 			height:100%;
 			width:100%;
 		}
+
+		#headblock{
+			width:20%;
+		}
+
+		#tailblock {
+			width:80%;
+		}
 	}
 
+	/* If large screen, display additional info in a fixed box size*/
 	@media screen and (min-width: 500px) {
 		.extra{
 			height:640px;
 			width:500px;
+		}
+
+		#headblock{
+			width:10%;
+		}
+
+		#tailblock {
+			width:90%;
 		}
 	}
 
@@ -52,13 +61,13 @@
 		<a class="ui-btn-right" href="#popupBasic" data-role="button" data-inline="true" data-rel="popup" data-transition="slidedown">Help</a>
 
 		<div id="popupBasic" data-role="popup">    
-			<p>Click on the profiles to expand for more data</p>
+			<p>Click to expand</p>
 		</div>
     </div><!-- /header -->
     
     <div data-role="content">
    
-		<ul id="list" class="ui-icon-alt" data-role="listview" data-inset="true" data-filter-placeholder="Search tweets..." data-filter="true"></ul>
+		<ul id="list" class="ui-icon-alt" data-role="listview" data-inset="true" data-filter-placeholder="Search tweets..." data-filter="true" style="word-wrap:break-word"></ul>
 
     </div><!-- /content -->
  
@@ -91,17 +100,32 @@
 			// Tweet related data
 			var text = data[i].text;
 			var id = data[i].id;
+			var date = data[i].created_at;
          	
 			// Load in main page data
 			var shtml='';  
 			shtml=shtml+'<li id="profile">';
 			shtml=shtml+ '<a href="#' + id +'" data-rel="popup" data-transition="pop">';
-            shtml=shtml+'<img id="image" width="100px" src="'+profileIm+'">';
-            shtml=shtml+'<h3>'+scrname+'</h3>';
-            shtml=shtml+'<p id="text">'+text+'</p>';
-			shtml=shtml+'<p>Source:'+url+'</p>';
+
+			// Profile header information
+			shtml=shtml+'<div class="ui-grid-a">';
+			shtml=shtml+'<div id="headblock"class="ui-block-a">';
+            	shtml=shtml+'<img id="icon" src="'+profileIm+'" style="display:inline">';
+			shtml=shtml+'</div>';
+			shtml=shtml+'<div id="tailblock" class="ui-block-b">';
+            	shtml=shtml+'<h1 id="scrname" style="height:40%; font-size:85%; text-align:left">'+scrname+'</h1>'
+			shtml=shtml+'<p id="date" style="height:60%; font-size:75%; text-align:left">'+date+'</p>';
+			shtml=shtml+'</div>';
+			shtml=shtml+'</div>';
+			
+			// Profile description information
+			shtml=shtml+'<div>';
+			shtml=shtml+'<p>_ _ _ _ _</p>';
+           	shtml=shtml+'<p id="text" style="white-space:normal">'+text+'</p>';
+			shtml=shtml+'<p id="src">Source:'+url+'</p>';
+			shtml=shtml+'</div>';
    
-            shtml=shtml+'</a></li>';
+            	shtml=shtml+'</a></li>';
 	
 			$('#list').append(shtml);
 		
@@ -112,7 +136,7 @@
 			// Profile information
 			shtml=shtml+'<div data-role="header" data-theme="b" style="height:48px">';
 			shtml=shtml+'<img border="0" id="popupID" src="'+profileIm+'" style="float:left;display:inline">';
-			shtml=shtml+'<h1>'+scrname+'</h1>';
+			shtml=shtml+'<h1>'+scrname+'</h1>';;
 			shtml=shtml+'</div>';
 
 			shtml=shtml+'<p> Real Name: '+name.bold()+'</p>';
@@ -120,7 +144,7 @@
 			shtml=shtml+'<p>Source: '+url+'</p>';
 			shtml=shtml+'<p style="font-size:80%">'+desc+'</p>';
 
-			// Insert additional twitter info
+			// INSERT ADDITIONAL DATA HERE
 			shtml=shtml+'<div data-role="navbar"> <ul><li><a class="ui-btn-active">Tweet</a></li></ul></div>';
 
 			// Back button 
