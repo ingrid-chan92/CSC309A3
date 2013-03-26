@@ -9,12 +9,14 @@
     <link rel="stylesheet" href="css/jquery.mobile-1.3.0-rc.1.css">
 
 	<style>
- 	body{ height:100%; width:100% }
+ 	body{ height:100%; width:100%; }
 
 	/* If screen is too small, don't display source url and reduce text size */
 	@media screen and (max-width: 640px) {
-		#text {font-size:75%;}
+		#text {font-size:70%;}
 		#src {display:none;}
+		#date {display:none;}
+		#icon {display:none;}
 	}
 
 	@media screen and (max-width: 500px) {
@@ -48,113 +50,150 @@
 		}
 	}
 
-
 	</style>
 
 </head>
+
 <body>
-
-<div data-role="page" id="back">
-
-    <div id="title" data-role="header" data-theme="b">
-        <h1 style="text-align:left">Your Tweets</h1>
-		<a class="ui-btn-right" href="#popupBasic" data-role="button" data-inline="true" data-rel="popup" data-transition="slidedown">Help</a>
-
-		<div id="popupBasic" data-role="popup">    
-			<p>Click profiles to expand for more data</p>
-		</div>
-    </div><!-- /header -->
-    
-    <div data-role="content">
-   
-		<ul id="list" class="ui-icon-alt" data-role="listview" data-inset="true" data-filter-placeholder="Search tweets..." data-filter="true" style="word-wrap:break-word"></ul>
-
-    </div><!-- /content -->
- 
-	<!-- Library of additonal data -->
-	<div id="dataLibrary"><div>  
-
-    <div class="jqm-footer">
-        <p class="jqm-version"></p>
-        <p>&copy; 2010, 2013 jQuery Foundation and other contributors:</p>
-    </div><!-- /jqm-footer -->
-    
-</div><!-- /page -->    
-
 </body>
 
 
 <script type="text/javascript">
+	var pagenum = 0;
+	var entry_limit = 2;
+	var MAX_PAGE = 0;
+	var curpage = 0;
+
     $.getJSON('model.json', function (data) {
-		
+
         for (var i = 0; i < data.length; i++) {
-
-			// Personal Data
-			var profileIm = data[i].user.profile_image_url	;	
-			var url = data[i].user.url;
-			var name = data[i].user.name;
-			var scrname = data[i].user.screen_name;
-			var location = data[i].user.screen_name;
-			var desc = data[i].user.description;
-			
-			// Tweet related data
-			var text = data[i].text;
-			var id = data[i].id;
-			var date = data[i].created_at;
-         	
-			// Load in main page data
-			var shtml='';  
-			shtml=shtml+'<li id="profile">';
-			shtml=shtml+ '<a href="#' + id +'" data-rel="popup" data-transition="pop">';
-
-			// Profile header information
-			shtml=shtml+'<div class="ui-grid-a">';
-			shtml=shtml+'<div id="headblock"class="ui-block-a">';
-            	shtml=shtml+'<img id="icon" src="'+profileIm+'" style="display:inline">';
-			shtml=shtml+'</div>';
-			shtml=shtml+'<div id="tailblock" class="ui-block-b">';
-            	shtml=shtml+'<h1 id="scrname" style="height:40%; font-size:85%; text-align:left">'+scrname+'</h1>'
-			shtml=shtml+'<p id="date" style="height:60%; font-size:75%; text-align:left">'+date+'</p>';
-			shtml=shtml+'</div>';
-			shtml=shtml+'</div>';
-			
-			// Profile description information
-			shtml=shtml+'<div>';
-			shtml=shtml+'<p>_ _ _ _ _</p>';
-           	shtml=shtml+'<p id="text" style="white-space:normal">'+text+'</p>';
-			shtml=shtml+'<p id="src">Source:'+url+'</p>';
-			shtml=shtml+'</div>';
-   
-            	shtml=shtml+'</a></li>';
-	
-			$('#list').append(shtml);
+	    	if(i % entry_limit == 0) {
+				pagenum = i / entry_limit;
+				MAX_PAGE = pagenum;
+				createDiv(pagenum);
+    		}
+			populateDiv(data[i], pagenum);
+       	}
 		
-			// Load in pop-up additional info
-			shtml=''; 
-			shtml=shtml+'<div class="extra" id="' + id + '" data-role="popup" data-theme="d">';
-
-			// Profile information
-			shtml=shtml+'<div data-role="header" data-theme="b" style="height:48px">';
-			shtml=shtml+'<img border="0" id="popupID" src="'+profileIm+'" style="float:left;display:inline">';
-			shtml=shtml+'<h1>'+scrname+'</h1>';;
-			shtml=shtml+'</div>';
-
-			shtml=shtml+'<p> Real Name: '+name.bold()+'</p>';
-			shtml=shtml+'<p>Location: '+location+'</p>';
-			shtml=shtml+'<p>Source: '+url+'</p>';
-			shtml=shtml+'<p style="font-size:80%">'+desc+'</p>';
-
-			// INSERT ADDITIONAL DATA HERE
-			shtml=shtml+'<div data-role="navbar"> <ul><li><a class="ui-btn-active">Tweet</a></li></ul></div>';
-
-			// Back button 
-			shtml=shtml+'<a href="#back" data-role="button" data-theme="b" data-corners="false">Back</a>';
-			shtml=shtml+'</div>';
-			$('#dataLibrary').append(shtml);
-
-        }
-
+		//add swipe bar for each page
+		for (var i = 0; i <=MAX_PAGE; i++) {
+		$('<ul data-role="listview" data-inset="true" data-theme="a" class="bar" data-position="fixed" data-id="samef"><li id="listitem">Swipe here to navigate ('+(i+1)+'/'+(MAX_PAGE+1)+') </li></ul>').appendTo($('#page'+i));
+		}
     });
+
+	$(document).ready(function() {
+		$(".bar").swiperight(function() {
+			curpage--;
+	   		if (curpage < 0) {
+		   		curpage = 0;
+			}
+			$.mobile.changePage("#page"+curpage, { transition: "fade"});
+		});   
+
+		$(".bar").swipeleft(function() {
+			curpage++;
+			if (curpage > MAX_PAGE) {
+			   curpage = MAX_PAGE;
+			}
+			$.mobile.changePage("#page"+curpage, { transition: "fade"});
+		});
+	});
+
+	function createDiv(pagenum){
+		var shtml = '';
+		shtml=shtml+'<div data-role="page" id="page'+pagenum+'"class="page">';
+
+		shtml=shtml+'<div id="title" data-role="header" data-theme="b" data-id="sameh" data-position="fixed">';
+		shtml=shtml+'<h1 style="text-align:left">Your Tweets</h1>';
+		shtml=shtml+'<a class="ui-btn-right" href="#popupBasic'+pagenum+'" data-role="button" data-inline="true" data-rel="popup" data-transition="slidedown">Help</a>';
+
+		shtml=shtml+'<div id="popupBasic'+pagenum+'" data-role="popup">';
+		shtml=shtml+'<p>Click profiles to expand for more data</p>';
+		shtml=shtml+'</div>';
+		shtml=shtml+'</div><!-- /header -->';
+		
+		shtml=shtml+'<div data-role="content">';
+	   
+		shtml=shtml+'<ul id="list'+pagenum+'" class="ui-icon-alt" data-role="listview" data-inset="true" data-filter-placeholder="Search tweets..." data-filter="true" style="word-wrap:break-word"></ul>';
+
+		shtml=shtml+'</div><!-- /content -->';
+	 
+		shtml=shtml+'<!-- Library of additonal data -->';
+		shtml=shtml+'<div id="dataLibrary'+pagenum+'"><div>';
+
+	    shtml=shtml+' <div class="jqm-footer">';
+		shtml=shtml+'<p class="jqm-version"></p>';
+		shtml=shtml+'<p>&copy; 2010, 2013 jQuery Foundation and other contributors:</p>';
+		shtml=shtml+'</div><!-- /jqm-footer -->';
+		
+		shtml=shtml+'</div><!-- /page -->';
+		$(shtml).appendTo('body');
+    }
+
+	function populateDiv(data, pagenum) {
+		// Personal Data
+		var profileIm = data.user.profile_image_url	;	
+		var url = data.user.url;
+		var name = data.user.name;
+		var scrname = data.user.screen_name;
+		var location = data.user.screen_name;
+		var desc = data.user.description;
+			
+		// Tweet related data
+		var text = data.text;
+		var id = data.id;
+		var date = data.created_at;
+         	
+		// Load in main page data
+		var shtml='';  
+		shtml=shtml+'<li id="profile">';
+		shtml=shtml+ '<a href="#' + id +'" data-rel="popup" data-transition="pop">';
+
+		// Profile header information
+		shtml=shtml+'<div class="ui-grid-a">';
+		shtml=shtml+'<div id="headblock" class="ui-block-a">';
+        shtml=shtml+'<img id="icon" src="'+profileIm+'">';
+		shtml=shtml+'</div>';
+		shtml=shtml+'<div id="tailblock" class="ui-block-">';
+        shtml=shtml+'<h1 id="scrname" style="height:40%; font-size:85%; text-align:left">'+scrname+'</h1>'
+		shtml=shtml+'<p id="date" style="height:60%; font-size:75%; text-align:left">'+date+'</p>';
+		shtml=shtml+'</div>';
+		shtml=shtml+'</div>';
+			
+		// Profile description information
+		shtml=shtml+'<div>';
+		shtml=shtml+'<p>_ _ _ _ _</p>';
+        shtml=shtml+'<p id="text" style="white-space:normal">'+text+'</p>';
+		shtml=shtml+'<p id="src">Source: '+url+'</p>';
+		shtml=shtml+'</div>';
+
+        shtml=shtml+'</a></li>';
+	
+		$('#list'+pagenum).append(shtml);
+
+		// Load in pop-up additional info
+		shtml=''; 
+		shtml=shtml+'<div class="extra" id="' + id + '" data-role="popup" data-theme="d">';
+
+		// Profile information
+		shtml=shtml+'<div data-role="header" data-theme="b" style="height:48px">';
+		shtml=shtml+'<img border="0" id="popupID" src="'+profileIm+'" style="float:left;display:inline">';
+		shtml=shtml+'<h1>'+scrname+'</h1>';;
+		shtml=shtml+'</div>';
+
+		shtml=shtml+'<p> Real Name: '+name.bold()+'</p>';
+		shtml=shtml+'<p>Location: '+location+'</p>';
+		shtml=shtml+'<p>Source: <a href="'+url+'" class="outlink" target="_blank"> '+url+'</a></p>';
+		shtml=shtml+'<p style="font-size:80%">'+desc+'</p>';
+
+		// INSERT ADDITIONAL DATA HERE
+		shtml=shtml+'<div data-role="navbar"> <ul><li><a class="ui-btn-active">Tweet</a></li></ul></div>';
+
+		// Back button 
+		shtml=shtml+'<a href="#back" data-role="button" data-theme="b" data-corners="false">Back</a>';
+		shtml=shtml+'</div>';
+		$('#dataLibrary'+pagenum).append(shtml);
+	}
 
 </script>
 
