@@ -13,4 +13,4 @@ Assignment 3 for course CSC309H1 Programming on the Web
 
 ## Important Note ##
 
-# The name of the local json file which is to be loaded should be "model.json", located in root folder (same folder with "client.html")
+* The name of the local json file which is to be loaded should be "model.json", located in root folder (same folder with "client.html")
