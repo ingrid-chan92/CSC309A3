@@ -14,7 +14,6 @@
 	/* If screen is too small, don't display source url and reduce text size */
 	@media screen and (max-width: 640px) {
 		#text {font-size:70%;}
-		#src {display:none;}
 		#date {display:none;}
 		#icon {display:none;}
 	}
@@ -174,7 +173,6 @@
 		shtml=shtml+'<div>';
 		shtml=shtml+'<p>_ _ _ _ _</p>';
         shtml=shtml+'<p id="text" style="white-space:normal">'+text+'</p>';
-		shtml=shtml+'<p id="src">Source: '+url+'</p>';
 		shtml=shtml+'</div>';
 
         shtml=shtml+'</a></li>';
