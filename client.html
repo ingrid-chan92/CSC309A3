@@ -64,7 +64,13 @@
 	var MAX_PAGE = 0;
 	var curpage = 0;
 
+	$.ajaxSetup({ async: false });
+
     $.getJSON('model.json', function (data) {
+
+		data.sort( function (a, b) {
+			return a.user.screen_name.toLowerCase() == b.user.screen_name.toLowerCase() ? 0 : (a.user.screen_name.toLowerCase() < b.user.screen_name.toLowerCase() ? -1 : 1);
+		});
 
         for (var i = 0; i < data.length; i++) {
 	    	if(i % entry_limit == 0) {
@@ -82,6 +88,8 @@
     });
 
 	$(document).ready(function() {
+		$.mobile.changePage("#page0");
+
 		$(".bar").swiperight(function() {
 			curpage--;
 	   		if (curpage < 0) {
@@ -98,6 +106,8 @@
 			$.mobile.changePage("#page"+curpage, { transition: "fade"});
 		});
 	});
+
+
 
 	function createDiv(pagenum){
 		var shtml = '';
