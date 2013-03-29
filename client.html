@@ -142,7 +142,7 @@
 
 	function populateDiv(data, pagenum) {
 		// Personal Data
-		var profileIm = data.user.profile_image_url	;	
+		var profileIm = data.user.profile_image_url;	
 		var url = data.user.url;
 		var name = data.user.name;
 		var scrname = data.user.screen_name;
@@ -153,6 +153,7 @@
 		var text = data.text;
 		var id = data.id;
 		var date = data.created_at;
+		var urlList = data.entities.urls;
          	
 		// Load in main page data
 		var shtml='';  
@@ -169,15 +170,16 @@
 		shtml=shtml+'<p id="date" style="height:60%; font-size:75%; text-align:left">'+date+'</p>';
 		shtml=shtml+'</div>';
 		shtml=shtml+'</div>';
+		shtml=shtml+'</a>';
 			
 		// Profile description information
 		shtml=shtml+'<div>';
 		shtml=shtml+'<p>_ _ _ _ _</p>';
-        shtml=shtml+'<p id="text" style="white-space:normal">'+text+'</p>';
-		shtml=shtml+'<p id="src">Source: '+url+'</p>';
+        shtml=shtml+'<p id="text" style="white-space:normal">'+findLinks(text, urlList)+'</p>';
+		shtml=shtml+'<p id="src">Source: <a href="'+url+'" class="outlink" target="_blank"> '+url+'</a></p>';
 		shtml=shtml+'</div>';
 
-        shtml=shtml+'</a></li>';
+        shtml=shtml+'</li>';
 	
 		$('#list'+pagenum).append(shtml);
 
@@ -203,6 +205,17 @@
 		shtml=shtml+'<a href="#back" data-role="button" data-theme="b" data-corners="false">Back</a>';
 		shtml=shtml+'</div>';
 		$('#dataLibrary'+pagenum).append(shtml);
+	}
+
+
+	//add <a> tags to links in text
+	function findLinks(text, urlList) {
+		var temp;
+		for(var i = 0; i < urlList.length; i++) {
+			temp = text.replace(urlList[i].url, '<a href="'+urlList[i].url+'" target="_blank">'+urlList[i].url+'</a>');
+			text = temp;		
+		}
+		return temp;
 	}
 
 </script>
