@@ -201,6 +201,12 @@
 		// INSERT ADDITIONAL DATA HERE
 		shtml=shtml+'<div data-role="navbar"> <ul><li><a class="ui-btn-active">Tweet</a></li></ul></div>';
 
+		// Add image button in the popup window if there exists image in the tweet
+		if (data.entities.media[0].media_url != 'undefined'){
+			var tweetImg = data.entities.media[0].media_url;
+			shtml=shtml+'<a href="'+tweetImg+'" target="_blank" data-role="button">Image</a>';
+		}
+
 		// Back button 
 		shtml=shtml+'<a href="#back" data-role="button" data-theme="b" data-corners="false">Back</a>';
 		shtml=shtml+'</div>';
