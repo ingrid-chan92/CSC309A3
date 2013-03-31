@@ -11,18 +11,30 @@
 	<style>
  	body{ height:100%; width:100%; }
 
-	/* If screen is too small, don't display source url and reduce text size */
-	@media screen and (max-width: 640px) {
-		#text {font-size:70%;}
+	@media screen and (max-width: 525px) {
+		#text {font-size:80%;}
 		#src {display:none;}
 		#date {display:none;}
-		#icon {display:none;}
-	}
 
-	@media screen and (max-width: 500px) {
 		.extra{
-			height:100%;
+			width:95%;
+		}
+
+		#addonInfo {
+			font-size:85%;
+		}
+
+		#imgblock {
+			display:none;
+		}
+
+		#imglink {
+			display:inline;
+		}
+
+		#tweetdata {
 			width:100%;
+			font-size:85%;
 		}
 
 		#headblock{
@@ -35,10 +47,26 @@
 	}
 
 	/* If large screen, display additional info in a fixed box size*/
-	@media screen and (min-width: 500px) {
+	@media screen and (min-width: 525px) {
 		.extra{
 			height:640px;
 			width:500px;
+		}
+
+		#imglink {
+			display:none;
+		}
+			
+		#imgblock {
+			width:30%;
+		}
+
+		#addonInfo {
+			font-size:90%;
+		}
+
+		#tweetdata {
+			width:70%;
 		}
 
 		#headblock{
@@ -118,13 +146,15 @@
 		shtml=shtml+'<a class="ui-btn-right" href="#popupBasic'+pagenum+'" data-role="button" data-inline="true" data-rel="popup" data-transition="slidedown">Help</a>';
 
 		shtml=shtml+'<div id="popupBasic'+pagenum+'" data-role="popup">';
-		shtml=shtml+'<p>Click profiles to expand for more data</p>';
+		shtml=shtml+'<p>Click profile headers to expand for more data</p>';
+		shtml=shtml+'<p>Swipe bottom bar to change pages</p>';
+		shtml=shtml+'<p>Click images in popup to expand/open in new page</p>';
 		shtml=shtml+'</div>';
 		shtml=shtml+'</div><!-- /header -->';
 		
 		shtml=shtml+'<div data-role="content">';
 	   
-		shtml=shtml+'<ul id="list'+pagenum+'" class="ui-icon-alt" data-role="listview" data-inset="true" data-filter-placeholder="Search tweets..." data-filter="true" style="word-wrap:break-word"></ul>';
+		shtml=shtml+'<ul id="list'+pagenum+'" class="ui-icon-alt" data-role="listview" data-inset="true" style="word-wrap:break-word"></ul>';
 
 		shtml=shtml+'</div><!-- /content -->';
 	 
@@ -146,9 +176,26 @@
 		var url = data.user.url;
 		var name = data.user.name;
 		var scrname = data.user.screen_name;
-		var location = data.user.screen_name;
 		var desc = data.user.description;
-			
+		var timezone = data.user.time_zone;
+		var language = data.user.lang;
+		var createdate = data.user.created_at;
+		var location; 
+		var src;
+
+		// Retreieve Location only if given
+		if (data.user.location == "") {
+			location = "n/a";
+		} else {
+			location = data.user.location;
+		}
+		// Retrieve source url only if given
+		if (data.source == "web") {
+			src = "web";
+		} else {
+			src = '<a target="_blank" ' + (data.source).substring(3);
+		}
+		
 		// Tweet related data
 		var text = data.text;
 		var id = data.id;
@@ -165,7 +212,7 @@
 		shtml=shtml+'<div id="headblock" class="ui-block-a">';
         shtml=shtml+'<img id="icon" src="'+profileIm+'">';
 		shtml=shtml+'</div>';
-		shtml=shtml+'<div id="tailblock" class="ui-block-">';
+		shtml=shtml+'<div id="tailblock" class="ui-block-b">';
         shtml=shtml+'<h1 id="scrname" style="height:40%; font-size:85%; text-align:left">'+scrname+'</h1>'
 		shtml=shtml+'<p id="date" style="height:60%; font-size:75%; text-align:left">'+date+'</p>';
 		shtml=shtml+'</div>';
@@ -173,10 +220,12 @@
 		shtml=shtml+'</a>';
 			
 		// Profile description information
-		shtml=shtml+'<div>';
+		shtml=shtml+'<div style="border:10px transparent solid">';
 		shtml=shtml+'<p>_ _ _ _ _</p>';
         shtml=shtml+'<p id="text" style="white-space:normal">'+findLinks(text, urlList)+'</p>';
-		shtml=shtml+'<p id="src">Source: <a href="'+url+'" class="outlink" target="_blank"> '+url+'</a></p>';
+
+		// Display source only if given
+		shtml=shtml+'<p id="src">Source: '+src+'</p>';
 		shtml=shtml+'</div>';
 
         shtml=shtml+'</li>';
@@ -185,27 +234,77 @@
 
 		// Load in pop-up additional info
 		shtml=''; 
-		shtml=shtml+'<div class="extra" id="' + id + '" data-role="popup" data-theme="d">';
+		shtml=shtml+'<div class="extra" id="' + id + '" data-role="popup" data-theme="d" data-overlay-theme="a">';
 
 		// Profile information
 		shtml=shtml+'<div data-role="header" data-theme="b" style="height:48px">';
 		shtml=shtml+'<img border="0" id="popupID" src="'+profileIm+'" style="float:left;display:inline">';
-		shtml=shtml+'<h1>'+scrname+'</h1>';;
+		shtml=shtml+'<h1>'+scrname+'</h1>';
 		shtml=shtml+'</div>';
 
-		shtml=shtml+'<p> Real Name: '+name.bold()+'</p>';
-		shtml=shtml+'<p>Location: '+location+'</p>';
-		shtml=shtml+'<p>Source: <a href="'+url+'" class="outlink" target="_blank"> '+url+'</a></p>';
+		shtml=shtml+'<p><b>Real Name: </b>'+name+'</p>';
+		shtml=shtml+'<p style="font-size: 85%"><b>Location: </b>'+location+'<br>';
+		shtml=shtml+'<b>Account created on: </b>'+createdate+'<br>';
+		shtml=shtml+'<b>Timezone: </b>'+timezone+'<br>';
+		shtml=shtml+'<b>Language: </b>'+language+'<br>';
+		shtml=shtml+'<b>Page: </b><a href="'+url+'" class="outlink" target="_blank"> '+url+'</a></p>';
 		shtml=shtml+'<p style="font-size:80%">'+desc+'</p>';
 
-		// INSERT ADDITIONAL DATA HERE
-		shtml=shtml+'<div data-role="navbar"> <ul><li><a class="ui-btn-active">Tweet</a></li></ul></div>';
+		// Additional Tweet data
+		shtml=shtml+'<div data-role="navbar"> <ul><li><a class="ui-btn-active">Tweet Data</a></li></ul></div>';
+		
+		// Basic Tweet info
+		shtml=shtml+'<div class="ui-grid-a">';
+		if (data.entities.media != undefined){
+			// Only show image of type photo
+			if (data.entities.media[0].type == "photo") {
+				var tweetImg = data.entities.media[0].media_url;
+				shtml=shtml+'<div id="imgblock" class="ui-block-a" style="width: 30%">';
 
-		// Add image button in the popup window if there exists image in the tweet
-		if (data.entities.media[0].media_url != 'undefined'){
-			var tweetImg = data.entities.media[0].media_url;
-			shtml=shtml+'<a href="'+tweetImg+'" target="_blank" data-role="button">Image</a>';
+				shtml=shtml+'<a href="'+tweetImg+'" target="_blank">';
+				shtml=shtml+'<img src="'+tweetImg+'" >';
+
+				shtml=shtml+'</a></div>';
+			}
 		}
+
+		shtml=shtml+'<div id="tweetdata" class="ui-block-b" style="border:10px white solid">';
+		shtml=shtml+'<h3>'+scrname+'</h3>';
+		shtml=shtml+'<p>'+findLinks(text, urlList)+'</p>';
+		shtml=shtml+'</div>';
+		shtml=shtml+'</div>';
+
+		// Additional Tweet info
+		shtml=shtml+'<div id="addonInfo"style="border:10px white solid">';
+		shtml=shtml+'<p><b>Source: </b>'+src+'</p>';
+		shtml=shtml+'<p><b>Created at : </b>'+date+'<br>';
+		shtml=shtml+'<b>Retweet Count : </b>'+data.retweet_count+'<br>';
+
+		var mentions = data.entities.user_mentions;
+		for(var i = 0; i < mentions.length; i++) {
+			if (i == 0) {
+				shtml=shtml+'<b>Users mentioned: </b>';
+ 			} else {
+				shtml=shtml+", "
+			}	
+
+			shtml=shtml+mentions[i].screen_name;
+		}
+
+		if (data.entities.media != undefined){
+			// Only show image of type photo
+			if (data.entities.media[0].type == "photo") {
+				var tweetImg = data.entities.media[0].media_url;
+				shtml=shtml+'<div id="imglink">';
+
+				shtml=shtml+'<b>Image : </b><a href="'+tweetImg+'" target="_blank">';
+				shtml=shtml+'link';
+
+				shtml=shtml+'</a></div>';
+			}
+		}
+
+		shtml=shtml+'</p></div>';
 
 		// Back button 
 		shtml=shtml+'<a href="#back" data-role="button" data-theme="b" data-corners="false">Back</a>';
