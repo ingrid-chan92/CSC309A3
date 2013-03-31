@@ -103,6 +103,16 @@
 		}
 	}
 
+	/* text in navigation bar non-highlightable */
+	.bar {
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+		outline: none;
+	}​
+
 	</style>
 </head>
 
@@ -110,7 +120,7 @@
 
 <script type="text/javascript">
 	var pagenum = 0;
-	var entry_limit = 2;
+	var entry_limit = 8;
 	var MAX_PAGE = 0;
 	var curpage = 0;
 
@@ -123,11 +133,11 @@
 		});
 		
 		var duallabel = "#dlist1";
+		MAX_PAGE = Math.ceil(data.length/entry_limit);
         for (var i = 0; i < data.length; i++) {
 	    	if(i % entry_limit == 0) {
 				pagenum = i / entry_limit;
-				MAX_PAGE = pagenum;
-				createDiv(pagenum);
+				createDiv(pagenum, MAX_PAGE);
     		}
 			populateDiv(data[i], pagenum, duallabel);
 			
@@ -139,10 +149,7 @@
 			}
        	}
 		
-		//add swipe bar for each page
-		for (var i = 0; i <=MAX_PAGE; i++) {
-		$('<ul data-role="listview" data-inset="true" data-theme="a" class="bar" data-position="fixed" data-id="samef"><li id="listitem">Swipe here to navigate ('+(i+1)+'/'+(MAX_PAGE+1)+') </li></ul>').appendTo($('#page'+i));
-		}
+
     });
 
 	$(document).ready(function() {
@@ -167,7 +174,7 @@
 
 
 
-	function createDiv(pagenum){
+	function createDiv(pagenum, pagemax){
 		var shtml = '';
 		shtml=shtml+'<div data-role="page" id="page'+pagenum+'"class="page">';
 
@@ -200,13 +207,16 @@
 		shtml=shtml+'</div><!-- /content -->';
 	 
 		shtml=shtml+'<!-- Library of additonal data -->';
-		shtml=shtml+'<div id="dataLibrary'+pagenum+'"><div>';
+		shtml=shtml+'<div id="dataLibrary'+pagenum+'"></div>';
 
 	    shtml=shtml+' <div class="jqm-footer">';
 		shtml=shtml+'<p class="jqm-version"></p>';
 		shtml=shtml+'<p>&copy; 2010, 2013 jQuery Foundation and other contributors:</p>';
 		shtml=shtml+'</div><!-- /jqm-footer -->';
-		
+
+		//navigation swipe bar
+		shtml=shtml+'<ul data-role="listview" data-inset="true" data-theme="a" class="bar" data-position="fixed" data-id="samef"><li id="listitem">Swipe here to navigate ('+(pagenum+1)+'/'+pagemax+') </li></ul>'
+
 		shtml=shtml+'</div><!-- /page -->';
 		$(shtml).appendTo('body');
     }
@@ -241,7 +251,6 @@
 		var text = data.text;
 		var id = data.id;
 		var date = data.created_at;
-		var urlList = data.entities.urls;
          	
 		// Load in main page data
 		var shtml='';  
@@ -310,7 +319,7 @@
 
 		shtml=shtml+'<div id="tweetdata" class="ui-block-b" style="border:10px white solid">';
 		shtml=shtml+'<h3>'+scrname+'</h3>';
-		shtml=shtml+'<p>'+findLinks(text, urlList)+'</p>';
+		shtml=shtml+'<p>'+findLinks(text, data.entities.urls, data.entities.media)+'</p>';
 		shtml=shtml+'</div>';
 		shtml=shtml+'</div>';
 
@@ -354,13 +363,20 @@
 
 
 	//add <a> tags to links in text
-	function findLinks(text, urlList) {
+	function findLinks(text, urlList, mediaList) {
 		var temp;
 		for(var i = 0; i < urlList.length; i++) {
 			temp = text.replace(urlList[i].url, '<a href="'+urlList[i].url+'" target="_blank">'+urlList[i].url+'</a>');
 			text = temp;		
 		}
-		return temp;
+
+		if (mediaList != undefined) { 
+			for(var i = 0; i < mediaList.length; i++) {
+				temp = text.replace(mediaList[i].url, '<a href="'+mediaList[i].url+'" target="_blank">'+mediaList[i].url+'</a>');
+				text = temp;		
+			}
+		}
+		return text;
 	}
 
 </script>
