@@ -11,19 +11,38 @@
 	<style>
  	body{ height:100%; width:100%; }
 
-	@media screen and (max-width: 525px) {
+	/* Dual list vs single list display */
+	@media screen and (max-width: 625px) {
+
+		#duallist {
+			display:none;
+		}
+
+		.ui-icon-alt{
+			display:inline;
+		}		
+	}
+
+	/* Dual list vs single list display */
+	@media screen and (min-width: 625px) {
+
+		#duallist {
+			display:inline;
+		}
+
+		.ui-icon-alt{
+			display:none;
+		}
+	}
+
+	/* Main page alterations */
+	@media screen and (max-width: 350px) {
 		#text {font-size:80%;}
-		#src {display:none;}
 		#date {display:none;}
+	}
 
-		.extra{
-			width:95%;
-		}
-
-		#addonInfo {
-			font-size:85%;
-		}
-
+	/* Image display depending on size of screen */
+	@media screen and (max-width: 400px) {
 		#imgblock {
 			display:none;
 		}
@@ -34,25 +53,11 @@
 
 		#tweetdata {
 			width:100%;
-			font-size:85%;
-		}
-
-		#headblock{
-			width:20%;
-		}
-
-		#tailblock {
-			width:80%;
 		}
 	}
-
-	@media screen and (min-width: 525px) {
-
-		/* If large screen, display additional info in a fixed box size*/
-		.extra{
-			width:465px;
-		}
-
+	
+	/* Image display depending on size of screen */
+	@media screen and (min-width: 400px) {
 		#imglink {
 			display:none;
 		}
@@ -61,31 +66,47 @@
 			width:30%;
 		}
 
+		#tweetdata {
+			width:70%;
+		}
+	}
+
+	/* Additional screen alterations */
+	@media screen and (max-width: 525px) {
+
+		.extra{
+			width:95%;
+		}
+
+		#addonInfo {
+			font-size:85%;
+		}
+
+		#tweetdata {
+			font-size:85%;
+		}
+	}
+
+	/* Additional screen alterations */
+	@media screen and (min-width: 525px) {
+
+		.extra{
+			width:465px;
+		}
+
 		#addonInfo {
 			font-size:90%;
 		}
 
 		#tweetdata {
-			width:70%;
 			font-size:90%;
-		}
-
-		#headblock{
-			width:10%;
-		}
-
-		#tailblock {
-			width:90%;
 		}
 	}
 
 	</style>
-
 </head>
 
-<body>
-</body>
-
+<body></body>
 
 <script type="text/javascript">
 	var pagenum = 0;
@@ -100,14 +121,22 @@
 		data.sort( function (a, b) {
 			return a.user.screen_name.toLowerCase() == b.user.screen_name.toLowerCase() ? 0 : (a.user.screen_name.toLowerCase() < b.user.screen_name.toLowerCase() ? -1 : 1);
 		});
-
+		
+		var duallabel = "#dlist1";
         for (var i = 0; i < data.length; i++) {
 	    	if(i % entry_limit == 0) {
 				pagenum = i / entry_limit;
 				MAX_PAGE = pagenum;
 				createDiv(pagenum);
     		}
-			populateDiv(data[i], pagenum);
+			populateDiv(data[i], pagenum, duallabel);
+			
+			// Alternate between first list and second list
+			if(duallabel == "#dlist1") {
+				duallabel = "#dlist2";
+			} else {
+				duallabel = "#dlist1";
+			}
        	}
 		
 		//add swipe bar for each page
@@ -143,19 +172,30 @@
 		shtml=shtml+'<div data-role="page" id="page'+pagenum+'"class="page">';
 
 		shtml=shtml+'<div id="title" data-role="header" data-theme="b" data-id="sameh" data-position="fixed">';
-		shtml=shtml+'<h1 style="text-align:left">Your Tweets</h1>';
+		shtml=shtml+'<h1 style="text-align:center">Your Tweets</h1>';
 		shtml=shtml+'<a class="ui-btn-right" href="#popupBasic'+pagenum+'" data-role="button" data-inline="true" data-rel="popup" data-transition="slidedown">Help</a>';
 
 		shtml=shtml+'<div id="popupBasic'+pagenum+'" data-role="popup">';
-		shtml=shtml+'<p>Click profile headers to expand for more data</p>';
+		shtml=shtml+'<p>Click profiles for more data</p>';
 		shtml=shtml+'<p>Swipe bottom bar to change pages</p>';
-		shtml=shtml+'<p>Click images in popup to expand/open in new page</p>';
+		shtml=shtml+'<p>Additional links and links-in-text are available in popup</p>';
 		shtml=shtml+'</div>';
 		shtml=shtml+'</div><!-- /header -->';
 		
 		shtml=shtml+'<div data-role="content">';
 	   
-		shtml=shtml+'<ul id="list'+pagenum+'" class="ui-icon-alt" data-role="listview" data-inset="true" style="word-wrap:break-word"></ul>';
+		// Single list
+		shtml=shtml+'<ul id="list'+pagenum+'" class="ui-icon-alt" data-role="listview" data-inset="true" style="word-wrap:break-word" data-icon="false"></ul>';
+
+		// Dual list
+		shtml=shtml+'<div class="ui-grid-a" id="duallist">';
+		shtml=shtml+'<div class="ui-block-a">';
+		shtml=shtml+'<ul id="dlist1'+pagenum+'" data-role="listview" data-inset="true" style="word-wrap:break-word" data-icon="false"></ul>';
+		shtml=shtml+'</div>';
+		shtml=shtml+'<div class="ui-block-b">';
+       	shtml=shtml+'<ul id="dlist2'+pagenum+'" data-role="listview" data-inset="true" style="word-wrap:break-word" data-icon="false"></ul>';
+		shtml=shtml+'</div>';
+		shtml=shtml+'</div>';
 
 		shtml=shtml+'</div><!-- /content -->';
 	 
@@ -171,7 +211,7 @@
 		$(shtml).appendTo('body');
     }
 
-	function populateDiv(data, pagenum) {
+	function populateDiv(data, pagenum, duallabel) {
 		// Personal Data
 		var profileIm = data.user.profile_image_url;	
 		var url = data.user.url;
@@ -210,28 +250,27 @@
 
 		// Profile header information
 		shtml=shtml+'<div class="ui-grid-a">';
-		shtml=shtml+'<div id="headblock" class="ui-block-a">';
+		shtml=shtml+'<div id="headblock" class="ui-block-a" style="width:20%">';
         shtml=shtml+'<img id="icon" src="'+profileIm+'">';
 		shtml=shtml+'</div>';
-		shtml=shtml+'<div id="tailblock" class="ui-block-b">';
+		shtml=shtml+'<div id="tailblock" class="ui-block-b" style="border:2px transparent solid; width:80%">';
         shtml=shtml+'<h1 id="scrname" style="height:40%; font-size:85%; text-align:left">'+scrname+'</h1>'
 		shtml=shtml+'<p id="date" style="height:60%; font-size:75%; text-align:left">'+date+'</p>';
 		shtml=shtml+'</div>';
 		shtml=shtml+'</div>';
-		shtml=shtml+'</a>';
 			
 		// Profile description information
 		shtml=shtml+'<div style="border:10px transparent solid">';
-		shtml=shtml+'<p>_ _ _ _ _</p>';
-        shtml=shtml+'<p id="text" style="white-space:normal">'+findLinks(text, urlList)+'</p>';
+        shtml=shtml+'<p id="text" style="white-space:normal">'+ text +'</p>';
 
 		// Display source only if given
-		shtml=shtml+'<p id="src">Source: '+src+'</p>';
 		shtml=shtml+'</div>';
 
+		shtml=shtml+'</a>';
         shtml=shtml+'</li>';
 	
 		$('#list'+pagenum).append(shtml);
+		$(duallabel+pagenum).append(shtml);
 
 		// Load in pop-up additional info
 		shtml=''; 
