@@ -11,6 +11,11 @@
 	<style>
  	body{ height:100%; width:100%; }
 
+	#icon {
+		height:48px;
+		width:48px;
+	}
+
 	/* Dual list vs single list display */
 	@media screen and (max-width: 625px) {
 
@@ -126,7 +131,7 @@
 
 	$.ajaxSetup({ async: false });
 
-    $.getJSON('model.json', function (data) {
+    $.getJSON('moredata.json', function (data) {
 
 		data.sort( function (a, b) {
 			return a.user.screen_name.toLowerCase() == b.user.screen_name.toLowerCase() ? 0 : (a.user.screen_name.toLowerCase() < b.user.screen_name.toLowerCase() ? -1 : 1);
@@ -234,6 +239,13 @@
 		var location; 
 		var src;
 
+		// Retrieve home page only if given
+		if (url != null) {
+			url = '<a href="'+url+'" class="outlink" target="_blank"> '+url+'</a>';
+		} else {
+			url = 'n/a';
+		}
+
 		// Retreieve Location only if given
 		if (data.user.location == "") {
 			location = "n/a";
@@ -255,7 +267,7 @@
 		// Load in main page data
 		var shtml='';  
 		shtml=shtml+'<li id="profile">';
-		shtml=shtml+ '<a href="#' + id +'" data-rel="popup" data-transition="pop">';
+		shtml=shtml+ '<a href="#' + id +'" data-rel="popup" data-transition="pop" data-position-to="window">';
 
 		// Profile header information
 		shtml=shtml+'<div class="ui-grid-a">';
@@ -286,8 +298,8 @@
 		shtml=shtml+'<div class="extra" id="' + id + '" data-role="popup" data-theme="d" data-overlay-theme="a">';
 
 		// Profile information
-		shtml=shtml+'<div data-role="header" data-theme="b" style="height:48px">';
-		shtml=shtml+'<img border="0" id="popupID" src="'+profileIm+'" style="float:left;display:inline">';
+		shtml=shtml+'<div data-role="header" data-theme="b" style="height:48px; width=48px">';
+		shtml=shtml+'<img border="0" id="icon" src="'+profileIm+'" style="float:left;display:inline;">';
 		shtml=shtml+'<h1>'+scrname+'</h1>';
 		shtml=shtml+'</div>';
 
@@ -296,7 +308,7 @@
 		shtml=shtml+'<b>Account created on: </b>'+createdate+'<br>';
 		shtml=shtml+'<b>Timezone: </b>'+timezone+'<br>';
 		shtml=shtml+'<b>Language: </b>'+language+'<br>';
-		shtml=shtml+'<b>Page: </b><a href="'+url+'" class="outlink" target="_blank"> '+url+'</a></p>';
+		shtml=shtml+'<b>Page: </b>'+url+'</p>';
 		shtml=shtml+'<p style="font-size:80%">'+desc+'</p>';
 
 		// Additional Tweet data
