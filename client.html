@@ -17,7 +17,7 @@
 	}
 
 	/* Dual list vs single list display */
-	@media screen and (max-width: 625px) {
+	@media screen and (max-width: 640px) {
 
 		#duallist {
 			display:none;
@@ -29,7 +29,7 @@
 	}
 
 	/* Dual list vs single list display */
-	@media screen and (min-width: 625px) {
+	@media screen and (min-width: 640px) {
 
 		#duallist {
 			display:inline;
@@ -131,7 +131,7 @@
 
 	$.ajaxSetup({ async: false });
 
-    $.getJSON('moredata.json', function (data) {
+    $.getJSON('favs.json', function (data) {
 
 		data.sort( function (a, b) {
 			return a.user.screen_name.toLowerCase() == b.user.screen_name.toLowerCase() ? 0 : (a.user.screen_name.toLowerCase() < b.user.screen_name.toLowerCase() ? -1 : 1);
@@ -191,6 +191,7 @@
 		shtml=shtml+'<p>Click profiles for more data</p>';
 		shtml=shtml+'<p>Swipe bottom bar to change pages</p>';
 		shtml=shtml+'<p>Additional links and links-in-text are available in popup</p>';
+		shtml=shtml+'<p>Click images in popup to expand</p>';
 		shtml=shtml+'</div>';
 		shtml=shtml+'</div><!-- /header -->';
 		
